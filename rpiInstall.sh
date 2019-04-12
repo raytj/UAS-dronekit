@@ -15,7 +15,7 @@ sudo apt-get --purge remove build-essential tk-dev libncurses5-dev libncursesw5-
 sudo apt-get autoremove -y
 sudo apt-get clean
 python3.7 -V
-sudo pip3.7 install opencv-python -y
+sudo pip3.7 install opencv-python
 sudo apt-get install python3-dev python-wxgtk3.0 python3-pip python3-matplotlib python3-pygame python3-lxml python3-yaml libxml2-dev git -y
 pip3.7 install MAVProxy
 echo "export PATH=$PATH:$HOME/.local/bin" >> ~/.bashrc
@@ -23,7 +23,7 @@ sudo adduser pi dialout
 cd ../..
 git clone https://github.com/raytj/dronekit-python.git
 cd dronekit-python
-pip3.7 install -r install_requires.txt -y
+pip3.7 install -r install_requires.txt
 python3.7 setup.py build
 python3.7 setup.py install
-pip3.7 install digi-xbee -y
+pip3.7 install digi-xbee
