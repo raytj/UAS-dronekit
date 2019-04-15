@@ -3,7 +3,7 @@ import time
 import math
 from pymavlink import mavutil
 from datetime import datetime
-import digi.xbee.devices
+from droneVehicle import droneVehicle, maxSonar
 
 #Set up option parsing to get connection string
 import argparse
@@ -13,13 +13,39 @@ parser.add_argument('--connect',
 args = parser.parse_args()
 
 connection_string = args.connect
-
-if not connection_string:
-	connection_string = '/dev/bin/ttyAMA0'
-
+###
+#if not connection_string:
+    #import dronekit_sitl
+    #sitl = dronekit_sitl.start_default(33.1945624862421, -87.4813413619995)
+    #connection_string = sitl.connection_string()
+	#connection_string = '/dev/bin/ttyAMA0'
+###
+proxy_string = 'udp:192.168.17.1:14550'
 # Connect to the Vehicle
-print('Connecting to vehicle on: %s' % connection_string)
-vehicle = connect(connection_string, wait_ready=True)
+print('Connecting to vehicle on: %s through %s' % (connection_string, proxy_string))
+vehicle = connect(proxy_string, wait_ready=True, vehicle_class=droneVehicle)
+#vehicle.parameters['RNGFND1_TYPE'] = 10
+#vehicle.parameters['RNGFND1_MAX_CM'] = 640
+#vehicle.parameters['RNGFND1_MIN_CM'] = 24
+#vehicle.parameters['RNGFND1_SCALE'] = 1.98
+last_rangefinder_distance = 0
+
+@vehicle.on_attribute('rangefinder')
+def rangefinder_callback(self, name, message):
+    if self.last_rangefinder_distance == round(self.rangefinder.distance, 1):
+        return
+    self.last_rangefinder_distance = round(self.rangefinder.distance, 1)
+    if self.rangefinder.distance <= 300 and self.mode == VehicleMode('AUTO') or self.mode == VehicleMode('GUIDED'):
+        self.mode = VehicleMode('BRAKE')
+        print("Collision imminent, stopping drone...")
+    print("Rangefinder (metres): %s" % last_rangefinder_distance)
+vehicle.add_attribute_listener('rangefinder', rangefinder_callback)
+@vehicle.on_attribute('mode')
+def avoidance_callback(self, attr_name, value):
+    if self.mode == VehicleMode('BRAKE'):
+        self.mode = VehicleMode('RTL')
+
+
 
 while not vehicle.is_armable:
     print(" Waiting for vehicle to initialise...")
@@ -159,6 +185,25 @@ def arm_and_takeoff(aTargetAltitude):
 
 import_mission_filename = 'mpmission.txt'
 export_mission_filename = 'exportedmission.txt'
+
+sonar1 = maxSonar(24, 640)
+vehicle.sonar = sonar1
+
+upload_mission(import_mission_filename)
+vehicle.mode = VehicleMode('GUIDED')
+arm_and_takeoff(40)
+vehicle.mode = VehicleMode('AUTO')
+vehicle.sonar.update(630)
+waypoint = vehicle.commands.next
+while True:
+    if waypoint < vehicle.commands.next:
+        vehicle.sonar.update(vehicle.sonar.distance - 25)
+        vehicle.send_SONAR_message(vehicle.sonar)
+
+
+
+
+"""
 while vehicle.is_armed is False:
     time.sleep(1)
 
@@ -184,3 +229,4 @@ if vehicle.mode.name == VehicleMode("AUTO").name:
         time.sleep(1)
     print('Return to launch')
     vehicle.mode = VehicleMode("RTL")
+"""
