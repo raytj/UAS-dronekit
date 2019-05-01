@@ -1,5 +1,7 @@
-import digi.xbee.devices
-
+import digi.xbee.devices, digi.xbee.util
+class xbeeMessage():
+	def __init__(self, xbee_message):
+        
 class xbeeDevice(XBeeDevice):
 	def __init__(self, *args, address=None, uasNode=None):
 		super(xbeeDevice, self).__init__(*args)
@@ -32,3 +34,7 @@ class xbeeDevice(XBeeDevice):
 			self.add_data_received_callback(data_receive_callback)
 		else:
 			print("error, xbee device not open\n")
+
+	def data_receive_callback(xbee_message):
+		address = address = xbee_message.remote_device.get_64bit_addr()
+		data = xbee_message.data.decode("utf8")

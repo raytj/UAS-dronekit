@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 class maxSonar(object):
-    def __init__(self, max_distance=None, min_distance=None, orientation=mavutil.mavlink.MAV_SENSOR_ROTATION_NONE, id=0):
+    def __init__(self, max_distance=0, min_distance=0, orientation=0, id=0):
         self.min_distance = min_distance
         self.max_distance = max_distance
         self.orientation = orientation
@@ -34,8 +34,8 @@ class droneVehicle(Vehicle):
             sonar.max_distance,    # max dist cm
             sonar.distance,   # current dist, int cm
             10,      # type sensor
-            sonar.id,      # on board id, not used
-            sonar.orientation, # orientation: 0...7
+            0,      # on board id, not used
+            0, # orientation: 0...7
             0,      # covariance, not used
             )
-        self.vehicle.send_mavlink(self.msg)
+        self.send_mavlink(self.msg)
