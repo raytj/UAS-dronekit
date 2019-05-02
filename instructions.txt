@@ -1,0 +1,16 @@
+run setup.sh
+in console type "lsub" and check to see what all is already there
+type "dmesg | grep tty" and see what is there
+plug teensy into pi
+do the lsub and dmesg again
+if anything changes on lsusb then thats the teensy port
+in the dronecode script put the port in the teensy_port variable at the top in the format '/dev/ttyUSB1' or whatever.
+			it may say AMA0 or something
+do the same checks for the usb radio
+in the startup script change the mavlink from "--out=/dev/ttyUSB0,57600" to whatever usb it is
+if I get to the xbee stuff do that same check and put the port in the xbee_port variable in the dronecode script
+
+The startup script needs to say:
+
+mavproxy.py --master=/dev/ttyAMA0 --baudrate 921600 --aircraft MyCopter --out=127.0.0.1:14550 --out=/dev/ttyUSB0 &
+and the same script you already had for dronecode

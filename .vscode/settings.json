@@ -1,5 +1,5 @@
 {
 	"python.linting.pylintEnabled": true,
-	"python.pythonPath": "d:\\Users\\Jacob\\Documents\\Repos\\dronekit-python\\dronekit3\\Scripts\\python3.exe",
+	"python.pythonPath": "D:\\Users\\Jacob\\Documents\\Repos\\dronekit-python\\dronekit3\\Scripts\\python3.exe",
 	"python.linting.enabled": true
 }
